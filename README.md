@@ -3,7 +3,6 @@ https://www.autohotkey.com/board/topic/4310-capshift-slow-down-and-extend-the-ca
 
 # CAPshift2.0 (Continuation and evolution of CAPshift)
 
-
 CAPshift is a Caps Lock (and optionally NumLock) extender!
 
 CAPshift creates a minuscule delay so that the capslock key can't just be knocked by mistake whilst typing, and must be held for x milliseconds to activate.
