@@ -1,5 +1,7 @@
 # CAPshift3.0 (Continuation and evolution of CAPshift and CAPshift 2.0)
 
+![CAPshift3](https://user-images.githubusercontent.com/1145722/163673868-b3ae0222-9378-49b9-aa80-ed22e74f540a.png)
+
 ## CAPshift is a Caps Lock (and optionally NumLock and Insert Lock) extender!
 
 CAPshift creates a minuscule (customizable delay so that the capslock key can't just be knocked by mistake whilst typing, and must be held for x milliseconds to activate.
