@@ -3,10 +3,13 @@
 ; Code for Sentence case borrowed from JDN and ManaUser.
 
 #NoTrayIcon
-#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
-SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
+#singleinstance force
+;#Persistent
+#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases. 
+SendMode Input  ; Recommended for new scripts due to its superior speed and reliability. 
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory. 
 
+iniRead, toggleInsert, CAPShift.ini, Settings, toggleInsert, true
 iniRead, toggleNumLock, CAPShift.ini, Settings, toggleNumLock, true
 iniRead, TimeLockToggle, CAPShift.ini, Settings, TimeLockToggle, 400
 iniRead, TimeOut, CAPShift.ini, Settings, TimeOut, 1000
@@ -19,6 +22,12 @@ iniRead, menuOnly, CAPShift.ini, Settings, menuOnly, false
 iniRead, soundBeeps, CAPShift.ini, Settings, soundBeeps, false
 
 ;Convert string to boolean as autohotkey sucks at interpreting booleans from iniRead
+if (toggleInsert = "true") {
+	toggleInsert := True
+}
+else if (toggleInsert = "False") {
+	toggleInsert := False
+}
 if (toggleNumLock = "true") {
 	toggleNumLock := True
 }
@@ -65,18 +74,24 @@ MenuTimer := (TimeOut//10)
 
 About =
 (LTrim0
-CAPShift 2.0
-(v: 01/03/17-01)
-Enhance and stickify the capslock and numlock keys. 
+CAPShift 3.0
+Enhance and stickify the capslock, numlock and insert keys. 
 
-Hold for %TimeLockToggle% ms to toggle capslock/numlock on or off.
+Hold for %TimeLockToggle% ms to toggle capslock/numlock/insert on or off. 
+(Note: Insert Lock is per app not a global state)
+
 Hold for %TimeOut% ms to show a menu that converts selected text to
 UPPER CASE, lower case, Title Case, iNVERT cASE, etc 
 
 Written by skrommel, evl, k.freeman and nascent
 ) 
 
-*CapsLock::
+*Insert::
+*NumpadIns::
+if (NOT toggleInsert = "true") {
+  Gosub, Insert_State_Toggle 
+  return
+}
 if (menuOnly = "true")
   GoSub, MENU
 
@@ -94,6 +109,41 @@ Loop, %MenuTimer%
     If (counter = ToggleTimer)
        if (progressBar = "true"){
          Progress, ZH16 ZX0 ZY0 B R0-%MenuTimer% CB%menuColor%
+       }
+     GetKeyState,state,Insert,P 
+
+     if  state=U
+        Break 
+  } 
+if (progressBar = "true"){
+  Progress, Off 
+}
+If counter=%MenuTimer% 
+  Gosub,MENU 
+Else If (counter>ToggleTimer) 
+  Gosub, Insert_State_Toggle 
+Return 
+
+
+
+*CapsLock:: 
+if (menuOnly = "true")
+  GoSub, MENU
+
+counter=0 
+if (progressBar = "true"){
+Progress, ZH16 ZX0 ZY0 B R0-%MenuTimer% CB%lockColor%
+}
+Loop, %MenuTimer% 
+  { 
+    Sleep,10 
+    counter+=1 
+    if (progressBar = "true"){
+      Progress, %counter% ;, SubText, MainText, WinTitle, FontName 
+    }
+    If (counter = ToggleTimer) 
+       if (progressBar = "true"){
+         Progress, ZH16 ZX0 ZY0 B R0-%MenuTimer% CB%menuColor% 
        }
      GetKeyState,state,CapsLock,P 
 
@@ -162,9 +212,9 @@ if (ToggleCaps = "true")
 else
 {
   Menu,main,Add,&CapsLock On,CapsLock_On
-  Menu,main,Add,C&apsLock Off,CapsLock_Off
+  Menu,main,Add,CapsL&ock Off,CapsLock_Off
 }
-if (ToggleCaps = "true")
+if (toggleNumLock = "true")
 {
   Menu,main,Add,&NumLock Toggle,NumLock_State_Toggle
 }
@@ -174,8 +224,19 @@ else
   Menu,main,Add,&NumLock On,NumLock_On
   Menu,main,Add,N&umLock Off,NumLock_Off
 }
+if (toggleInsert = "true")
+{
+  Menu,main,Add,&Insert Toggle,Insert_State_Toggle
+}
+else
+{
+  Menu,main,Add,
+  Menu,main,Add,&NumLock On,NumLock_On
+  Menu,main,Add,N&umLock Off,NumLock_Off
+}
 Menu,main,Add,
 Menu,settings,Add,&Sticky Numlock,MNUMBERLOCK
+Menu,settings,Add,Sticky &Insert,MINSERT
 Menu,settings,Add,&Lock Keys Trigger Immediate Menu,MDIRECT
 Menu,settings,Add,&Toggle Timer,TTIMER
 Menu,settings,Add,&Menu Timer, MTIMER
@@ -191,6 +252,8 @@ Menu,convert,Add,&Sentence case,MENU_ACTION
 Menu,convert,Add,&Title Case,MENU_ACTION
 Menu,convert,Add,&Smart Title Case,MENU_ACTION
 Menu,convert,Add,&iNVERT cASE,MENU_ACTION
+;Menu,convert,Add,
+Menu,convert,Add,Remove_illegal_characters,MENU_ACTION
 Menu,convert,Add,Remove_&under_scores,MENU_ACTION
 Menu,convert,Add,Remove.&full.stops,MENU_ACTION
 Menu,main,Add,Con&vert Text, :convert
@@ -276,6 +339,13 @@ Else If ThisMenuItem =&iNVERT cASE
       string.=char
     }
   StringCaseSense,Off
+  }
+Else If ThisMenuItem =Remove_Illegal_characters
+  {
+  StringLower, string, string
+      ;string := RegExReplace(string, "(((^|([.!?]\s+))[a-z])| i | i')", "$u1")
+	  string := RegExReplace(string, "[/\\?%*:|<>]", "$u1")
+  
   }
 Else If ThisMenuItem =Remove_&under_scores
   StringReplace, string, string,_,%A_Space%, All
@@ -363,6 +433,43 @@ NumLock_Off:
   NumLock_State_Toggle(state)
 Return
 
+Insert_State_Toggle: 
+  If GetKeyState("Insert","T") 
+    state=off 
+  Else 
+    state=On
+  Insert_State_Toggle(state) 
+Return 
+
+Insert_State_Toggle(State) 
+{ 
+  iniRead, toggleInsert, CAPShift.ini, Settings, toggleInsert, true
+  ;SetInsertState,%State% 	
+  Send {INSERT}
+  if (toggleInsert = "true") {
+    iniRead, soundBeeps, CAPShift.ini, Settings, soundBeeps, false
+    if (soundBeeps = "true"){
+      SoundBeep
+    }
+    iniRead, enableTooltips, CAPShift.ini, Settings, enableTooltips, true
+    if (enableTooltips = "true"){
+       tooltiptext = Insert %State%
+       ToolTip,%tooltiptext% 
+       SetTimer,TOOLTIP,On 
+    }
+  }
+} 
+
+Insert_On:
+  state=On 
+  Insert_State_Toggle(state) 
+Return
+
+Insert_Off:
+  state=Off
+  Insert_State_Toggle(state) 
+Return
+
 MlockColor:
 inputBox, TCCOLOR, CAPShift: Progress Bar Color, Enter the desired color wanted for the capslock/numlock progress bar`n(RGB format example: FF0000 is Red),,,,,,,,%lockColor%
 if TCCOLOR !=
@@ -441,6 +548,20 @@ IfMsgBox Yes
 else IfMsgBox No
    {
    iniWrite, false, CAPShift.ini, Settings, toggleNumLock
+   }
+sleep 100
+reload
+return
+
+MINSERT:
+MsgBox, 4, CAPShift: Insert, Select Yes if you want sticky Insert, or No if you want this program to ignore Insert
+IfMsgBox Yes
+   {
+   iniWrite, true, CAPShift.ini, Settings, toggleInsert
+   }
+else IfMsgBox No
+   {
+   iniWrite, false, CAPShift.ini, Settings, toggleInsert
    }
 sleep 100
 reload
