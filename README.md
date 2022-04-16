@@ -50,4 +50,4 @@ https://autohotkey.com/board/topic/72876-why-isnt-this-uppercase-script-working/
 Credit to HansBKK for the suggestion.
 
 # Autohotkey
-This is an AutoHotkey Script. To create an executable from it download AutoHotkey from autohotkey.com and use AHK2EXE to compile it into IdleLock.exe
+This is an AutoHotkey Script. To create an executable from it download AutoHotkey from autohotkey.com and use AHK2EXE to compile it into CAPShift.exe
