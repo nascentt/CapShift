@@ -1,5 +1,4 @@
 # CAPshift3.0 (Continuation and evolution of CAPshift and CAPshift 2.0)
-
 ![CAPshift3](https://user-images.githubusercontent.com/1145722/163673868-b3ae0222-9378-49b9-aa80-ed22e74f540a.png)
 
 ## CAPshift is a Caps Lock (and optionally NumLock and Insert Lock) extender!
@@ -50,4 +49,7 @@ https://autohotkey.com/board/topic/72876-why-isnt-this-uppercase-script-working/
 Credit to HansBKK for the suggestion.
 
 # Autohotkey
-This is an AutoHotkey Script. To create an executable from it download AutoHotkey from autohotkey.com and use AHK2EXE to compile it into CAPShift.exe
+This is an AutoHotkey Script. Download AutoHotkey from autohotkey.com and use AHK2EXE to compile it into CAPShift.exe or down directly below.
+
+# Download
+To download CapShift, [get the latest release.](https://github.com/nascentt/CapShift/releases/latest/download/CapShift.exe)
