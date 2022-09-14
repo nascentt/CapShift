@@ -52,4 +52,4 @@ Credit to HansBKK for the suggestion.
 This is an AutoHotkey Script. Download AutoHotkey from autohotkey.com and use AHK2EXE to compile it into CAPShift.exe or down directly below.
 
 # Download
-To download CapShift, [get the latest release.](https://github.com/nascentt/CapShift/releases/latest/download/CapShift.exe)
+To download CapShift, [get the latest release.](https://github.com/nascentt/CapShift/releases/latest/download/CapShift3.exe)
